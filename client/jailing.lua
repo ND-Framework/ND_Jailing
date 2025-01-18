@@ -10,7 +10,7 @@ local function jailInput()
             label = "Nearby players",
             placeholder = "Select a player",
             required = true,
-            options = nearbyPlayers
+            options = nearbyPlayers or {{ value = 0, label = "No players found nearby!", disabled = true }}
         },
         {
             type = "number",
