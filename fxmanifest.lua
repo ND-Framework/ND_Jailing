@@ -25,3 +25,7 @@ server_scripts {
 client_scripts {
     "client/**"
 }
+
+dependencies {
+    "ND_Core"
+}
