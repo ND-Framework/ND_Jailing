@@ -68,10 +68,11 @@ local function sendToDiscord(title, description, fields)
     PerformHttpRequest(discord.webhook, function(err, text, headers) end, 'POST', json.encode({username = "Jail logs", embeds = embed}), {["Content-Type"] = "application/json"})
 end
 
-RegisterNetEvent("ND_Jailing:sentencePlayer", function(targetSrc, sentenceTime)
-    local src = source
+local function jailPlayer(src, targetSrc, sentenceTime, adminByPass)
     local player = NDCore.getPlayer(src)
-    if not player or not lib.table.contains(allowedJobs, player.job) then return end
+    if not player then return end
+
+    if not lib.table.contains(allowedJobs, player.job) and not adminByPass then return end
 
     targetSrc = tonumber(targetSrc)
     sentenceTime = tonumber(sentenceTime)
@@ -82,7 +83,7 @@ RegisterNetEvent("ND_Jailing:sentencePlayer", function(targetSrc, sentenceTime)
 
     sendToDiscord("Jail logs", ("**Jail time:** %s minute(s)"):format(sentenceTime), {
         {
-            name = "**Officer:**",
+            name = adminByPass and "**Admin (used /jail command):**" or "**Officer:**",
             value = ("**Server ID:** %s\n**Username:** %s\n**Character name:** %s"):format(src, GetPlayerName(src), player.fullname)
         },
         {
@@ -95,6 +96,11 @@ RegisterNetEvent("ND_Jailing:sentencePlayer", function(targetSrc, sentenceTime)
     targetPlayer.setMetadata("jailed", sentenceTime)
     TriggerClientEvent("ND_Jailing:sentencePlayer", targetSrc, true)
     sentenceNotify(targetPlayer, sentenceTime)
+end
+
+RegisterNetEvent("ND_Jailing:sentencePlayer", function(targetSrc, sentenceTime)
+    local src = source
+    jailPlayer(src, targetSrc, sentenceTime)
 end)
 
 AddEventHandler("ND:characterLoaded", function(player)
@@ -137,4 +143,23 @@ lib.addCommand("unjail", {
 
     targetPlayer.setMetadata("jailed", nil)
     TriggerClientEvent("ND_Jailing:sentencePlayer", targetPlayer.source, false)
+end)
+
+lib.addCommand("jail", {
+    help = "Admin command, jail player.",
+    restricted = "group.admin",
+    params = {
+        {
+            name = "target",
+            type = "playerId",
+            help = "Target player's server id"
+        },
+        {
+            name = "time",
+            type = "number",
+            help = "Amount of time in (minutes) to jail for"
+        }
+    }
+}, function(source, args, raw)
+    jailPlayer(source, args.target, args.time, true)
 end)
