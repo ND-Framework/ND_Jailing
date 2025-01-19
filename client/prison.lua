@@ -66,5 +66,7 @@ RegisterNetEvent("ND_Jailing:sentencePlayer", function(setJailed)
 
     if NDCore.isResourceStarted("ND_Characters") then
         exports["ND_Characters"]:allowChangeCommand(not setJailed, setJailed and "can't change character while jailed")
+    elseif NDCore.isResourceStarted("ND_Players") then
+        exports["ND_Players"]:allowChangeCommand(not setJailed, setJailed and "can't change character while jailed")
     end
 end)
