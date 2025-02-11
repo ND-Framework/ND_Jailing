@@ -1,5 +1,6 @@
 local allowedJobs = require("data.jobs")
 local discord = lib.load("data.discord")
+local commandPerms = lib.load("data.commands");
 
 lib.callback.register("ND_Jailing:getNearbyPlayers", function(src)
     local player = NDCore.getPlayer(src)
@@ -129,7 +130,7 @@ end)
 
 lib.addCommand("unjail", {
     help = "Admin command, unjail player.",
-    restricted = "group.admin",
+    restricted = commandPerms.unjail,
     params = {
         {
             name = "target",
@@ -147,7 +148,7 @@ end)
 
 lib.addCommand("jail", {
     help = "Admin command, jail player.",
-    restricted = "group.admin",
+    restricted = commandPerms.jail,
     params = {
         {
             name = "target",
